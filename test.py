@@ -25,3 +25,6 @@ for cityname in dbcursor:
 dbcursor.execute("select name, population from country")
 for (c , p ) in dbcursor:
     print(c, p)
+
+dbcursor.close()
+cnx.close()

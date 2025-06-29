@@ -3,10 +3,10 @@ import mysql.connector
 #
 print("建立資料庫連線中")
 cnx=mysql.connector.connect(
-    # host="127.0.0.1",
-    host="172.16.16.107",
+    host="127.0.0.1",
+    # host="172.16.16.107",
     port=3306,
-    user="dbuser",
+    user="dbuser2",
     password="1234",
     database="world"
 )
@@ -18,13 +18,13 @@ print("執行 select name from city")
 print("記得開權限")
 #grant insert,update,select on world.* to 'dbuser'@"%";
 #flush privileges;
-dbcursor.execute("select name from city")
+dbcursor.execute("select name from city limit 3")
 for cityname in dbcursor:
     print(cityname)
 
-dbcursor.execute("select name, population from country")
-for (c , p ) in dbcursor:
-    print(c, p)
+# dbcursor.execute("select name, population from country")
+# for (c , p ) in dbcursor:
+#     print(c, p)
 
 dbcursor.close()
 cnx.close()

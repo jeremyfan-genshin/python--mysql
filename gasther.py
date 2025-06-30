@@ -37,7 +37,7 @@ cursor.execute('''
 sql = "INSERT INTO users2 (name, email) VALUES (%s, %s)"
 val = ("王小明", "xiaoming@example.com")
 cursor.execute(sql, val)
-# connect.commit()  # 提交事務
+connect.commit()  # 提交事務
     
 
 

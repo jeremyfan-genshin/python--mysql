@@ -1,0 +1,155 @@
+空氣最好都市 = 
+ADDCOLUMNS(
+    'dim_六都縣市',
+    
+    -- 良好天數（Good + Moderate）
+    "良好",
+    CALCULATE(
+        COUNTROWS(air_quality),
+        USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+        air_quality[status] IN {"good", "moderate"}
+    ),
+
+    -- 不良天數（Unhealthy levels）
+    "不良",
+    CALCULATE(
+                        COUNTROWS(air_quality),
+                        USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+                        air_quality[status] IN {"unhealthy for sensitive groups", "unhealthy", "very unhealthy"}
+    ),
+
+    -- 良率
+    "良率",
+    VAR goodCount = CALCULATE(
+        COUNTROWS(air_quality),
+        USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+        air_quality[status] IN {"good", "moderate"}
+    )
+    VAR badCount = CALCULATE(
+        COUNTROWS(air_quality),
+        USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+        air_quality[status] IN {"unhealthy for sensitive groups", "unhealthy", "very unhealthy"}
+    )
+    RETURN DIVIDE(goodCount, goodCount + badCount)
+)
+
+
+
+
+空氣最好都市 = ADDCOLUMNS('dim_六都縣市',
+        "良好",
+        var x = countax(FILTER(air_quality,'air_quality'[county] = 'dim_六都縣市'[county] && 'air_quality'[status] IN {"good", "moderate"}),
+        air_quality[status])
+		return x,
+	
+        "不良",
+        var y = countax(FILTER(air_quality,'air_quality'[county] = 'dim_六都縣市'[county] && 'air_quality'[status] IN {"unhealthy for sensitive groups", "unhealthy","very unhealthy"}),
+        air_quality[status])
+		return y,
+	
+        "良率",
+        var z = countax(FILTER(air_quality,'air_quality'[county] = 'dim_六都縣市'[county] && 'air_quality'[status] IN {"good", "moderate"}),
+        air_quality[status]) / (countax(FILTER(air_quality,'air_quality'[county] = 'dim_六都縣市'[county] && 'air_quality'[status] IN {"unhealthy for sensitive groups", "unhealthy","very unhealthy"}),
+        air_quality[status]) + countax(FILTER(air_quality,'air_quality'[county] = 'dim_六都縣市'[county] && 'air_quality'[status] IN {"good", "moderate"}),
+        air_quality[status]))
+		return z
+        )
+
+
+
+空氣最好都市 :=
+SELECTCOLUMNS(
+    ADDCOLUMNS(
+        'dim_六都縣市',
+        
+        "goodCount",
+        CALCULATE(
+            COUNTROWS(air_quality),
+            USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+            air_quality[status] IN {"good", "moderate"}
+        ),
+
+        "badCount",
+        CALCULATE(
+            COUNTROWS(air_quality),
+            USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+            air_quality[status] IN {"unhealthy for sensitive groups", "unhealthy", "very unhealthy"}
+        )
+    ),
+    
+    -- 最終要顯示的欄位
+    "縣市", [county],
+    "良好", [goodCount],
+    "不良", [badCount],
+    "良率", DIVIDE([goodCount], [goodCount] + [badCount])
+)
+
+
+
+
+
+
+        你這個 DAX 是想做一張表，顯示六都縣市的空氣狀況統計（良好、不良、良率）。
+你目前是用 FILTER + air_quality[county] = 'dim_六都縣市'[county] 來手動建立關聯，但這種寫法會：
+
+重複運算
+
+沒有善用資料模型的關聯性（效率低）
+
+無法使用現有關聯或非作用中關聯（inactive relationship）
+
+✅ 解法：使用 USERELATIONSHIP 搭配 CALCULATE 提高效能與可讀性
+首先，你必須確保：
+
+dim_六都縣市[county] 與 air_quality[county] 有關聯
+
+如果那條關聯是非作用中的（Inactive），就要用 USERELATIONSHIP 明確啟用它
+
+✅ 改寫範例（最佳化版）
+DAX
+複製
+編輯
+空氣最好都市 :=
+ADDCOLUMNS(
+    'dim_六都縣市',
+    
+    -- 良好天數（Good + Moderate）
+    "良好",
+    CALCULATE(
+        COUNTROWS(air_quality),
+        USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+        air_quality[status] IN {"good", "moderate"}
+    ),
+
+    -- 不良天數（Unhealthy levels）
+    "不良",
+    CALCULATE(
+        COUNTROWS(air_quality),
+        USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+        air_quality[status] IN {"unhealthy for sensitive groups", "unhealthy", "very unhealthy"}
+    ),
+
+    -- 良率
+    "良率",
+    VAR goodCount = CALCULATE(
+        COUNTROWS(air_quality),
+        USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+        air_quality[status] IN {"good", "moderate"}
+    )
+    VAR badCount = CALCULATE(
+        COUNTROWS(air_quality),
+        USERELATIONSHIP('dim_六都縣市'[county], air_quality[county]),
+        air_quality[status] IN {"unhealthy for sensitive groups", "unhealthy", "very unhealthy"}
+    )
+    RETURN DIVIDE(goodCount, goodCount + badCount)
+)
+🧠 說明重點
+原寫法	改寫後
+FILTER() 每次重複資料掃描	使用 CALCULATE + USERELATIONSHIP 高效呼叫關聯
+COUNTAX(..., air_quality[status])	簡化為 COUNTROWS()，因為沒必要
+使用靜態關聯 =, 效能差	USERELATIONSHIP 啟用模型中的非主動關聯
+
+📌 小提示：
+若模型中該關聯是主動（Active）關聯，就不需要使用 USERELATIONSHIP。
+
+如果你希望把這個表用於視覺化（例如條狀圖），這種寫法會運算更快、顯示也更穩定。

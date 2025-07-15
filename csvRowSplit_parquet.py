@@ -21,9 +21,9 @@ df_part1 = df.iloc[:chunk_size]  # 第一份 1000 筆
 df_part2 = df.iloc[chunk_size:chunk_size*2]  # 第二份 1000 筆
 df_part3 = df.iloc[chunk_size*2:]  # 第三份 剩餘的資料
 
-# 儲存三個檔案
-df_part1.to_csv(f'{output_prefix}_1.csv', index=False, header=first)
-df_part2.to_csv(f'{output_prefix}_2.csv', index=False, header=False)
-df_part3.to_csv(f'{output_prefix}_3.csv', index=False, header=False)
+# 儲存三個檔案為 Parquet 格式
+df_part1.to_parquet(f'{output_prefix}_1.parquet', index=False, engine='pyarrow')
+df_part2.to_parquet(f'{output_prefix}_2.parquet', index=False, engine='pyarrow')
+df_part3.to_parquet(f'{output_prefix}_3.parquet', index=False, engine='pyarrow')
 
-print("✅ 完成切分並儲存為三個檔案")
+print("✅ 完成切分並儲存為三個 Parquet 檔案")

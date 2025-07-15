@@ -3,7 +3,7 @@ import os
 
 # 設定檔案路徑與欄位名稱
 input_csv_path = r'air_quality.csv'
-output_dir = r'air_quality_csv_sep'
+output_dir = r'air_quality_parquet_sep'
 date_column = 'date'
 year_column = 'year'
 
@@ -29,10 +29,9 @@ df[year_column] = df[date_column].dt.year
 # 建立資料夾（如果資料夾已存在，則不會重複創建）
 os.makedirs(output_dir, exist_ok=True)
 
-# 依年份分檔並儲存
+# 依年份分檔並儲存為 Parquet 格式
 for year, group in df.groupby(year_column):
     # 使用完整路徑來儲存檔案
-    output_filename = os.path.join(output_dir, f'air_quality_{year}.csv')
-    group.to_csv(output_filename, index=False, header=first)
+    output_filename = os.path.join(output_dir, f'air_quality_{year}.parquet')
+    group.to_parquet(output_filename, index=False, engine='pyarrow')  # 使用 pyarrow 引擎
     print(f'✅ 已儲存：{output_filename}')
-    first = False  # 後續檔案不寫入欄位名稱

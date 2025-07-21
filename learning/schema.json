@@ -1,0 +1,55 @@
+{
+  "table_name": "building_transfer",
+  "columns": {
+    "id": {
+      "type": "INT",
+      "primary_key": true,
+      "auto_increment": true
+    },
+    "building_age": {
+      "type": "INT",
+      "nullable": true,
+      "comment": "屋齡"
+    },
+    "transfer_area_sqm": {
+      "type": "DECIMAL(10,2)",
+      "nullable": true,
+      "comment": "建物移轉面積平方公尺"
+    },
+    "main_use": {
+      "type": "VARCHAR(100)",
+      "nullable": true,
+      "comment": "主要用途"
+    },
+    "main_material": {
+      "type": "VARCHAR(100)",
+      "nullable": true,
+      "comment": "主要建材"
+    },
+    "completion_date": {
+      "type": "DATE",
+      "nullable": true,
+      "comment": "建築完成日期"
+    },
+    "total_floors": {
+      "type": "VARCHAR(20)",
+      "nullable": true,
+      "comment": "總層數"
+    },
+    "building_floors": {
+      "type": "VARCHAR(50)",
+      "nullable": true,
+      "comment": "建物分層"
+    },
+    "transfer_status": {
+      "type": "VARCHAR(50)",
+      "nullable": true,
+      "comment": "移轉情形"
+    }
+    "transfer_statusddddddd": {
+      "type": "VARCHAR(50)",
+      "nullable": true,
+      "comment": "移轉情形ddddddd"
+    }
+  }
+}

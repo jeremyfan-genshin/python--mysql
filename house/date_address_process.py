@@ -28,7 +28,7 @@ def normalize_address(addr):
     return addr
 
 # --- 加入經緯度 ---
-def append_geocode(df, address_col='地址'):
+def append_geocode(df, address_col='address'):
     geolocator = Nominatim(user_agent="my_geocoder")
     geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
 
@@ -88,7 +88,7 @@ if __name__ == '__main__':
                 df = pd.read_csv(csv_path, skiprows=1)
 
                 # 如果有地址欄位，進行正規化與地理編碼
-                if '地址' in df.columns:
+                if 'address' in df.columns:
                     df = append_geocode(df)
 
                 # 儲存為 parquet

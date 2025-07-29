@@ -15,7 +15,7 @@ if __name__ == '__main__':
     })
 
     # 初始化地理編碼器
-    geolocator = Nominatim(user_agent="my_geocoder")
+    geolocator = (user_agent="my_geocoder")
 
     # 加上速率限制器（避免被封鎖）
     geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
